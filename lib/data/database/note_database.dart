@@ -1,13 +1,18 @@
 import 'package:basic_api_riverpod/data/database/note.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
 class NoteDatabase {
   static late Isar isar;
 
+  NoteDatabase() {
+    initializeDatabase();
+  }
 // Initializing the database
   Future<void> initializeDatabase() async {
-    final dir = await getApplicationCacheDirectory();
+    final dir = await getApplicationDocumentsDirectory();
     isar = await Isar.open([NoteSchema], directory: dir.path);
   }
 
@@ -46,3 +51,10 @@ class NoteDatabase {
     await isar.writeTxn(() => isar.notes.delete(id));
   }
 }
+
+final noteProvider = Provider<NoteDatabase>((ref) => NoteDatabase());
+final noteDataProvider = FutureProvider((ref) async {
+  return ref.watch(noteProvider).currentNotes;
+});
+
+

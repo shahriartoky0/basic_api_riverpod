@@ -1,16 +1,22 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/database/note_database.dart';
 
-class NoteTakingPage extends StatefulWidget {
+class NoteTakingPage extends ConsumerStatefulWidget {
   @override
   _NoteTakingPageState createState() => _NoteTakingPageState();
 }
 
-class _NoteTakingPageState extends State<NoteTakingPage> {
+class _NoteTakingPageState extends ConsumerState<NoteTakingPage> {
   final TextEditingController _noteTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  String _noteText = "";
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch the notes when the page initializes
+    ref.read(noteProvider).fetchNotes();
+  }
 
   void _showBottomSheet() {
     showModalBottomSheet<void>(
@@ -36,12 +42,13 @@ class _NoteTakingPageState extends State<NoteTakingPage> {
                 const SizedBox(height: 18),
                 ElevatedButton(
                   child: Text('Save Note'),
-                  onPressed: () {
-                    // Handle saving the note (e.g., store in database)
+                  onPressed: ()  {
                     if (_formKey.currentState!.validate()) {
-
+                      ref.read(noteProvider).addNote(_noteTEController.text);
+                      _noteTEController.clear();
+                      ref.read(noteProvider).fetchNotes();
+                      Navigator.pop(context);
                     }
-                    Navigator.pop(context);
                   },
                 ),
                 const SizedBox(height: 100)
@@ -55,12 +62,38 @@ class _NoteTakingPageState extends State<NoteTakingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final noteDatabase = ref.watch(noteProvider);
+    print(noteDatabase);
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Note Taking"),
       ),
-      body: Center(
-        child: Text("No notes yet"),
+      body: FutureBuilder(
+        future: noteDatabase.fetchNotes(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (noteDatabase.currentNotes.isEmpty) {
+            return Center(child: Text("No notes yet"));
+          } else {
+            return ListView.builder(
+              itemCount: noteDatabase.currentNotes.length,
+              itemBuilder: (context, index) {
+                final note = noteDatabase.currentNotes[index];
+                return ListTile(
+                  title: Text(note.text),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+                      noteDatabase.deleteNote(note.id!);
+                    },
+                  ),
+                );
+              },
+            );
+          }
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showBottomSheet,
