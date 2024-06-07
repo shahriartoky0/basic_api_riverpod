@@ -5,7 +5,7 @@ import 'data/database/note_database.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final noteDatabase = NoteDatabase();
+  final noteDatabase = NoteDatabaseNotifier();
   await noteDatabase.initializeDatabase();
   runApp(const ProviderScope(child: MyApp()));
 }
