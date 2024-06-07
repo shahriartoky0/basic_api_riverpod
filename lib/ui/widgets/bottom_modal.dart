@@ -3,13 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/database/note_database.dart';
 
-class bottom_modal extends StatelessWidget {
-  const bottom_modal({
+class BottomModal extends StatelessWidget {
+  const BottomModal({
     super.key,
     required GlobalKey<FormState> formKey,
     required TextEditingController noteTEController,
     required this.ref,
-  }) : _formKey = formKey, _noteTEController = noteTEController;
+  })  : _formKey = formKey,
+        _noteTEController = noteTEController;
 
   final GlobalKey<FormState> _formKey;
   final TextEditingController _noteTEController;
@@ -39,11 +40,11 @@ class bottom_modal extends StatelessWidget {
                   return null;
                 },
                 controller: _noteTEController,
-                decoration: InputDecoration(hintText: "Enter your note"),
+                decoration: const InputDecoration(hintText: "Enter your note"),
               ),
               const SizedBox(height: 18),
               ElevatedButton(
-                child: Text('Save Note'),
+                child: const Text('Save Note'),
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     await ref

@@ -28,7 +28,7 @@ class _NoteTakingPageState extends ConsumerState<NoteTakingPage> {
       isScrollControlled: true,
       context: context,
       builder: (BuildContext context) {
-        return bottom_modal(
+        return BottomModal(
             formKey: _formKey, noteTEController: _noteTEController, ref: ref);
       },
     );
@@ -85,5 +85,10 @@ class _NoteTakingPageState extends ConsumerState<NoteTakingPage> {
             note: note);
       },
     );
+  }
+  @override
+  void dispose() {
+    _noteTEController.dispose();
+    super.dispose();
   }
 }
