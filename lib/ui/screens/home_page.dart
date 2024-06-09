@@ -1,94 +1,108 @@
+import 'package:basic_api_riverpod/ui/screens/tween_animation_page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/database/note.dart';
-import '../../data/database/note_database.dart';
-import '../widgets/bottom_modal.dart';
-import '../widgets/update_dialouge.dart';
+import 'package:flutter/widgets.dart';
 
-class NoteTakingPage extends ConsumerStatefulWidget {
-  const NoteTakingPage({super.key});
+class BuiltInAnimationPage extends StatefulWidget {
+  const BuiltInAnimationPage({super.key});
 
   @override
-  _NoteTakingPageState createState() => _NoteTakingPageState();
+  State<BuiltInAnimationPage> createState() => _BuiltInAnimationPageState();
 }
 
-class _NoteTakingPageState extends ConsumerState<NoteTakingPage> {
-  final TextEditingController _noteTEController = TextEditingController();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+class _BuiltInAnimationPageState extends State<BuiltInAnimationPage> {
+  double _width = 200.0;
+  double _height = 200.0;
 
-  @override
-  void initState() {
-    super.initState();
-    // Fetch the notes when the page initializes
-    ref.read(noteProvider.notifier).fetchNotes();
+  Color _color = Colors.purple;
+  double _opacity = 1;
+
+  bool _isAnimated = false; // Flag to track animation state
+  bool _isHidden = false; // Flag to track hidden animation state
+
+  void _hideTextAnimation() {
+    _isHidden = !_isHidden;
+    if (_isHidden) {
+      _opacity = 0;
+    } else {
+      _opacity = 1;
+    }
+    setState(() {});
   }
 
-  void _showBottomSheet() {
-    showModalBottomSheet<void>(
-      isScrollControlled: true,
-      context: context,
-      builder: (BuildContext context) {
-        return BottomModal(
-            formKey: _formKey, noteTEController: _noteTEController, ref: ref);
-      },
-    );
+  void _toggleAnimation() {
+    setState(() {
+      _isAnimated = !_isAnimated;
+      if (_isAnimated) {
+        _width = 400.0;
+        _height = 400.0;
+        _color = Colors.blue;
+      } else {
+        _width = 200.0;
+        _height = 200.0;
+        _color = Colors.purple;
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final notes = ref.watch(noteProvider);
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Note Taking"),
-      ),
-      body: notes.isEmpty
-          ? const Center(child: Text("No notes yet"))
-          : Visibility(
-              replacement: const Center(child: CircularProgressIndicator()),
-              visible: ref.read(noteProvider.notifier).loader == false,
-              child: ListView.builder(
-                itemCount: notes.length,
-                itemBuilder: (context, index) {
-                  final note = notes[index];
-                  return ListTile(
-                    onLongPress: () => _showUpdateDialogue(note),
-                    title: Text(note.text),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              color: Colors.grey.shade400,
+              height: 150,
+              width: 250,
+              margin: EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  ElevatedButton(
                       onPressed: () {
-                        ref.read(noteProvider.notifier).deleteNote(note.id);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => TweenAnimationPage()));
                       },
-                    ),
-                  );
-                },
+                      child: Text('Tween Animation Page'))
+                ],
               ),
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showBottomSheet,
-        child: const Icon(Icons.add),
+            IconButton(
+                onPressed: _toggleAnimation,
+                icon: Icon(
+                  _isAnimated ? Icons.pause : Icons.play_arrow,
+                  size: 50,
+                )),
+            AnimatedContainer(
+              duration: const Duration(seconds: 3),
+              curve: Curves.easeInOut,
+              // Animation curve for smooth transition
+              width: _width,
+              height: _height,
+              color: _color,
+              child: Center(
+                child: const Text(
+                  'Animated Container',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ), // Center content
+            ),
+            Container(
+              padding: EdgeInsets.all(10),
+              decoration:
+                  BoxDecoration(border: Border.all(color: Colors.black)),
+              child: AnimatedOpacity(
+                  opacity: _opacity,
+                  child: TextButton(
+                      onPressed: _hideTextAnimation, child: Text("Hide Me")),
+                  duration: Duration(seconds: 2)),
+            )
+          ],
+        ),
       ),
     );
-  }
-
-  void _showUpdateDialogue(Note note) {
-    _noteTEController.text =
-        note.text; // Set the current note text to the controller
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return update_dialouge(
-            formKey: _formKey,
-            noteTEController: _noteTEController,
-            ref: ref,
-            mounted: mounted,
-            note: note);
-      },
-    );
-  }
-  @override
-  void dispose() {
-    _noteTEController.dispose();
-    super.dispose();
   }
 }
