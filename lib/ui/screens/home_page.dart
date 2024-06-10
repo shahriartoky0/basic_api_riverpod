@@ -1,4 +1,4 @@
-import 'package:basic_api_riverpod/ui/screens/tween_animation_page.dart';
+import 'package:basic_api_riverpod/ui/screens/widgets/table_of_content.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -52,24 +52,7 @@ class _BuiltInAnimationPageState extends State<BuiltInAnimationPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              color: Colors.grey.shade400,
-              height: 150,
-              width: 250,
-              margin: EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => TweenAnimationPage()));
-                      },
-                      child: Text('Tween Animation Page'))
-                ],
-              ),
-            ),
+            TableOfContent(inBuiltinPage: true),
             IconButton(
                 onPressed: _toggleAnimation,
                 icon: Icon(
