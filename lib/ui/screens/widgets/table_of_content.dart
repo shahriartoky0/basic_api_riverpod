@@ -1,3 +1,4 @@
+import 'package:basic_api_riverpod/ui/screens/package_animation_page.dart';
 import 'package:flutter/material.dart';
 
 import '../controller_animation_page.dart';
@@ -10,11 +11,13 @@ class TableOfContent extends StatelessWidget {
     this.inBuiltinPage = false,
     this.inTweenAnimationPage = false,
     this.inControllerPage = false,
+    this.inPackageAnimationPage = false,
   });
 
   final bool inBuiltinPage;
   final bool inTweenAnimationPage;
   final bool inControllerPage;
+  final bool inPackageAnimationPage;
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +59,17 @@ class TableOfContent extends StatelessWidget {
                 }
               },
               child: Text('Controller Animation Page')),
+          SizedBox(height: 20),
+          ElevatedButton(
+              onPressed: () {
+                if (inPackageAnimationPage == false) {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => PackageAnimationPage()));
+                }
+              },
+              child: Text('Package Animation Page')),
           SizedBox(height: 20),
         ],
       ),
